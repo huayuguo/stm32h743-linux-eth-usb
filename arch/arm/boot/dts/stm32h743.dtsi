@@ -306,18 +306,6 @@
 			};
 		};
 
-		usbotg_hs: usb@40040000 {
-			compatible = "st,stm32f7-hsotg";
-			reg = <0x40040000 0x40000>;
-			interrupts = <77>;
-			clocks = <&rcc USB1OTG_CK>;
-			clock-names = "otg";
-			g-rx-fifo-size = <256>;
-			g-np-tx-fifo-size = <32>;
-			g-tx-fifo-size = <128 128 64 64 64 64 32 32>;
-			status = "disabled";
-		};
-
 		usbotg_fs: usb@40080000 {
 			compatible = "st,stm32f4x9-fsotg";
 			reg = <0x40080000 0x40000>;
@@ -511,10 +499,25 @@
 				status = "disabled";
 			};
 		};
+
+		mac: ethernet@40028000 {
+			compatible = "st,stm32-dwmac", "snps,dwmac-4.10a";
+			reg = <0x40028000 0x8000>;
+			reg-names = "stmmaceth";
+			clock-names = "stmmaceth", "mac-clk-tx", "mac-clk-rx";
+			clocks = <&rcc ETH1MAC_CK>,<&rcc ETH1TX_CK>,<&rcc ETH1RX_CK>;
+			reset-names = "stmmaceth";
+			resets = <&rcc STM32H7_AHB1_RESET(ETH1MAC)>;
+			interrupts = <61>, <62>;
+			interrupt-names = "macirq", "eth_wake_irq";
+			st,syscon = <&syscfg 0x4>;
+			status = "disabled";
+		};
+
 	};
 };
 
 &systick {
-	clock-frequency = <250000000>;
+	clock-frequency = <400000000>;
 	status = "okay";
 };

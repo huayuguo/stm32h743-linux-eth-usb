@@ -54,11 +54,27 @@
 	};
 
 	memory {
-		reg = <0xd0000000 0x2000000>;
+		reg = <0x60000000 0x2000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		linux,dma {
+			compatible = "shared-dma-pool";
+			no-map;
+			reg = <0x61e00000 0x200000>;
+			alignment = <0x2000>;
+			linux,dma-default;
+		};
+
 	};
 
 	aliases {
 		serial0 = &usart1;
+		eth0 = &mac;
 	};
 
 	vdda: regulator-vdda {
@@ -110,11 +126,36 @@
 	status = "okay";
 };
 
-&usbotg_hs {
-	pinctrl-0 = <&usbotg_hs_pins_a>;
+&usbotg_fs {
+	dr_mode = "host";
+	pinctrl-0 = <&usbotg_fs_pins_a>;
 	pinctrl-names = "default";
-	phys = <&usbotg_hs_phy>;
-	phy-names = "usb2-phy";
-	dr_mode = "otg";
 	status = "okay";
+};
+
+&mac {
+	status = "okay";
+	pinctrl-0 = <&ethernet_rmii>;
+	phy-mode = "rmii";
+	phy-handle = <&phy0>;
+	max-speed = <100>;
+	clock_in_out = "input";
+	snps,reset-gpio = <&gpiob 12 0>;
+	snps,reset-active-low;
+	rx-fifo-depth = <2048>;
+	tx-fifo-depth = <2048>;
+	snps,no-pbl-x8;
+	snps,txpbl = <32>;
+	snps,rxpbl = <32>;
+	snps,fixed-burst;
+	snps,aal;
+	snps,reset-delays-us = <0 10000 1000000>;
+	mdio0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "snps,dwmac-mdio";
+		phy0: ethernet-phy@0 {
+                        reg = <0>;
+		};
+	};
 };

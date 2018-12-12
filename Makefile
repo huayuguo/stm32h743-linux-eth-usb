@@ -5,6 +5,9 @@ SUBLEVEL = 7
 EXTRAVERSION =
 NAME = "People's Front"
 
+ARCH=arm
+CROSS_COMPILE=arm-none-eabi-
+
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
 # More info can be located in ./README
