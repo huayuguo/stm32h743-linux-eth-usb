@@ -330,7 +330,7 @@
 			interrupt-controller;
 			#interrupt-cells = <2>;
 			reg = <0x58000000 0x400>;
-			interrupts = <1>, <2>, <3>, <6>, <7>, <8>, <9>, <10>, <23>, <40>, <41>, <62>, <76>;
+			interrupts = <1>, <2>, <3>, <6>, <7>, <8>, <9>, <10>, <23>, <40>, <41>, <76>;
 		};
 
 		syscfg: system-config@58000400 {
@@ -501,11 +501,11 @@
 		};
 
 		mac: ethernet@40028000 {
-			compatible = "st,stm32-dwmac", "snps,dwmac-4.10a";
+			compatible = "st,stm32h7-dwmac", "snps,dwmac-4.10a";
 			reg = <0x40028000 0x8000>;
 			reg-names = "stmmaceth";
-			clock-names = "stmmaceth", "mac-clk-tx", "mac-clk-rx";
-			clocks = <&rcc ETH1MAC_CK>,<&rcc ETH1TX_CK>,<&rcc ETH1RX_CK>;
+			clock-names = "stmmaceth", "mac-clk-tx", "mac-clk-rx", "syscfg-clk";
+			clocks = <&rcc ETH1MAC_CK>,<&rcc ETH1TX_CK>,<&rcc ETH1RX_CK>,<&rcc SYSCFG_CK>;
 			reset-names = "stmmaceth";
 			resets = <&rcc STM32H7_AHB1_RESET(ETH1MAC)>;
 			interrupts = <61>, <62>;

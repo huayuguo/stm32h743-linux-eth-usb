@@ -24,6 +24,7 @@
 #include "stmmac_platform.h"
 
 #define SYSCFG_MCU_ETH_MASK		BIT(23)
+#define SYSCFG_H7_ETH_MASK		GENMASK(23, 21)
 #define SYSCFG_MP1_ETH_MASK		GENMASK(23, 16)
 
 #define SYSCFG_PMCR_ETH_CLK_SEL		BIT(16)
@@ -34,6 +35,7 @@
 #define SYSCFG_PMCR_ETH_SEL_GMII	0
 #define SYSCFG_MCU_ETH_SEL_MII		0
 #define SYSCFG_MCU_ETH_SEL_RMII		1
+
 
 struct stm32_dwmac {
 	struct clk *clk_tx;
@@ -89,6 +91,10 @@ static int stm32_dwmac_init(struct plat_stmmacenet_data *plat_dat)
 			clk_disable_unprepare(dwmac->clk_tx);
 		}
 	}
+#ifdef CONFIG_MACH_STM32H743
+	writel(0x3800000, (void __iomem *)0x58000404);
+	pr_info("stm32h7 remap 0x%x\n",readl((void __iomem *)0x58000404));
+#endif
 
 	return ret;
 }
@@ -101,6 +107,7 @@ static int stm32mp1_clk_prepare(struct stm32_dwmac *dwmac, bool prepare)
 		ret = clk_prepare_enable(dwmac->syscfg_clk);
 		if (ret)
 			return ret;
+		pr_info("stm32mp1_clk_prepare : syscfg_clk enable!\n");
 
 		if (dwmac->int_phyclk) {
 			ret = clk_prepare_enable(dwmac->clk_eth_ck);
@@ -170,7 +177,7 @@ static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
 		break;
 	case PHY_INTERFACE_MODE_RMII:
 		val = SYSCFG_MCU_ETH_SEL_RMII;
-		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_RMII\n");
+		pr_info("SYSCFG init : PHY_INTERFACE_MODE_RMII\n");
 		break;
 	default:
 		pr_debug("SYSCFG init :  Do not manage %d interface\n",
@@ -178,7 +185,8 @@ static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
 		/* Do not manage others interfaces */
 		return -EINVAL;
 	}
-
+	pr_info("SYSCFG init :RMII regmapADD=0x%x reg=0x%x val=0x%x\n",
+								dwmac->regmap,reg,val);
 	return regmap_update_bits(dwmac->regmap, reg,
 				 dwmac->ops->syscfg_eth_mask, val);
 }
@@ -215,6 +223,7 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
 		err = dwmac->ops->parse_data(dwmac, dev);
 		if (err)
 			return err;
+		dev_info(dev, "ETH set syscon clk ok...\n");
 	}
 
 	/* Get mode register */
@@ -251,6 +260,30 @@ static int stm32mp1_parse_data(struct stm32_dwmac *dwmac,
 	if (IS_ERR(dwmac->clk_ethstp)) {
 		dev_err(dev, "No ETH peripheral clock provided for CStop mode ...\n");
 		return PTR_ERR(dwmac->clk_ethstp);
+	}
+
+	/*  Clock for sysconfig */
+	dwmac->syscfg_clk = devm_clk_get(dev, "syscfg-clk");
+	if (IS_ERR(dwmac->syscfg_clk)) {
+		dev_err(dev, "No syscfg clock provided...\n");
+		return PTR_ERR(dwmac->syscfg_clk);
+	}
+
+	return 0;
+}
+
+static int stm32h7_parse_data(struct stm32_dwmac *dwmac,
+			       struct device *dev)
+{
+
+	/* Check if internal clk from RCC selected */
+	if (dwmac->int_phyclk) {
+		/*  Get ETH_CLK clocks */
+		dwmac->clk_eth_ck = devm_clk_get(dev, "eth-ck");
+		if (IS_ERR(dwmac->clk_eth_ck)) {
+			dev_err(dev, "No ETH CK clock provided...\n");
+			return PTR_ERR(dwmac->clk_eth_ck);
+		}
 	}
 
 	/*  Clock for sysconfig */
@@ -407,6 +440,14 @@ static struct stm32_ops stm32mcu_dwmac_data = {
 	.syscfg_eth_mask = SYSCFG_MCU_ETH_MASK
 };
 
+static struct stm32_ops stm32h7_dwmac_data = {
+	.set_mode = stm32mcu_set_mode,
+	.clk_prepare = stm32mp1_clk_prepare,
+	.suspend = stm32mcu_suspend,
+	.parse_data = stm32h7_parse_data,
+	.syscfg_eth_mask = SYSCFG_H7_ETH_MASK
+};
+
 static struct stm32_ops stm32mp1_dwmac_data = {
 	.set_mode = stm32mp1_set_mode,
 	.clk_prepare = stm32mp1_clk_prepare,
@@ -419,6 +460,7 @@ static struct stm32_ops stm32mp1_dwmac_data = {
 static const struct of_device_id stm32_dwmac_match[] = {
 	{ .compatible = "st,stm32-dwmac", .data = &stm32mcu_dwmac_data},
 	{ .compatible = "st,stm32mp1-dwmac", .data = &stm32mp1_dwmac_data},
+	{ .compatible = "st,stm32h7-dwmac", .data = &stm32h7_dwmac_data},
 	{ }
 };
 MODULE_DEVICE_TABLE(of, stm32_dwmac_match);

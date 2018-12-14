@@ -38,6 +38,7 @@
  *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  *     OTHER DEALINGS IN THE SOFTWARE.
+ *		snps,reset-active-low;
  */
 
 /dts-v1/;
@@ -141,7 +142,6 @@
 	max-speed = <100>;
 	clock_in_out = "input";
 	snps,reset-gpio = <&gpiob 12 0>;
-	snps,reset-active-low;
 	rx-fifo-depth = <2048>;
 	tx-fifo-depth = <2048>;
 	snps,no-pbl-x8;
