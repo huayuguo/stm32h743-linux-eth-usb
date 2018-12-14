@@ -175,13 +175,13 @@
 
 			usart1_pins: usart1@0 {
 				pins1 {
-					pinmux = <STM32_PINMUX('B', 14, AF4)>; /* USART1_TX */
+					pinmux = <STM32_PINMUX('A', 9, AF7)>; /* USART1_TX */
 					bias-disable;
 					drive-push-pull;
 					slew-rate = <0>;
 				};
 				pins2 {
-					pinmux = <STM32_PINMUX('B', 15, AF4)>; /* USART1_RX */
+					pinmux = <STM32_PINMUX('A', 10, AF7)>; /* USART1_RX */
 					bias-disable;
 				};
 			};
