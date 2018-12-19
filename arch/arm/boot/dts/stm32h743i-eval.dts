@@ -55,7 +55,7 @@
 	};
 
 	memory {
-		reg = <0x60000000 0x2000000>;
+		reg = <0xc0000000 0x2000000>;
 	};
 
 	reserved-memory {
@@ -66,7 +66,7 @@
 		linux,dma {
 			compatible = "shared-dma-pool";
 			no-map;
-			reg = <0x61e00000 0x200000>;
+			reg = <0x30000000 0x20000>;
 			alignment = <0x2000>;
 			linux,dma-default;
 		};
@@ -85,14 +85,6 @@
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
 	};
-
-	usbotg_hs_phy: usb-phy {
-		#phy-cells = <0>;
-		compatible = "usb-nop-xceiv";
-		clocks = <&rcc USB1ULPI_CK>;
-		clock-names = "main_clk";
-	};
-
 };
 
 &adc_12 {

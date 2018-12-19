@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 ccflags-$(CONFIG_USB_DWC2_DEBUG)	+= -DDEBUG
 ccflags-$(CONFIG_USB_DWC2_VERBOSE)	+= -DVERBOSE_DEBUG
+KBUILD_CFLAGS += -DDEBUG
 
 obj-$(CONFIG_USB_DWC2)			+= dwc2.o
 dwc2-y					:= core.o core_intr.o platform.o

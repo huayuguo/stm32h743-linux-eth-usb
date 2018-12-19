@@ -387,6 +387,10 @@ static int dwc2_driver_probe(struct platform_device *dev)
 	struct resource *res;
 	int retval;
 
+	dev_info(&dev->dev, "RCC_AHB1ENR USB2OTGEN bit26 27 =%x\n",readl((void __iomem *)0x580244d8));
+	writel(readl((void __iomem *)0x580244d8) | 0x18000000, (void __iomem *)0x580244d8);
+	dev_info(&dev->dev, "RCC_AHB1ENR USB2OTGEN bit26 27 =%x\n",readl((void __iomem *)0x580244d8));
+
 	hsotg = devm_kzalloc(&dev->dev, sizeof(*hsotg), GFP_KERNEL);
 	if (!hsotg)
 		return -ENOMEM;
