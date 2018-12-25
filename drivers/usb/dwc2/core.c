@@ -738,9 +738,9 @@ void dwc2_dump_host_registers(struct dwc2_hsotg *hsotg)
 		addr = hsotg->regs + HCTSIZ(i);
 		dev_dbg(hsotg->dev, "HCTSIZ	 @0x%08lX : 0x%08X\n",
 			(unsigned long)addr, dwc2_readl(hsotg, HCTSIZ(i)));
-		addr = hsotg->regs + HCDMA(i);
-		dev_dbg(hsotg->dev, "HCDMA	 @0x%08lX : 0x%08X\n",
-			(unsigned long)addr, dwc2_readl(hsotg, HCDMA(i)));
+		//addr = hsotg->regs + HCDMA(i);
+		//dev_dbg(hsotg->dev, "HCDMA	 @0x%08lX : 0x%08X\n",
+			//(unsigned long)addr, dwc2_readl(hsotg, HCDMA(i)));
 		if (hsotg->params.dma_desc_enable) {
 			addr = hsotg->regs + HCDMAB(i);
 			dev_dbg(hsotg->dev, "HCDMAB	 @0x%08lX : 0x%08X\n",

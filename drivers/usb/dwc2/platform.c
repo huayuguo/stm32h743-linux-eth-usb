@@ -388,7 +388,18 @@ static int dwc2_driver_probe(struct platform_device *dev)
 	int retval;
 
 	dev_info(&dev->dev, "RCC_AHB1ENR USB2OTGEN bit26 27 =%x\n",readl((void __iomem *)0x580244d8));
-	writel(readl((void __iomem *)0x580244d8) | 0x18000000, (void __iomem *)0x580244d8);
+	writel(readl((void __iomem *)0x580244d8) | 0x8000000, (void __iomem *)0x580244d8); //otg2 en
+	writel(readl((void __iomem *)0x5802480c) | 1<<24, (void __iomem *)0x5802480c); //usb vdd3 en
+	writel(readl((void __iomem *)0x58024400) | 1<<12, (void __iomem *)0x58024400);//rc48 en
+	dev_info(&dev->dev, "RC 48 =%x\n",readl((void __iomem *)0x58024400));
+	writel(readl((void __iomem *)0x580244ec) | 1<<1, (void __iomem *)0x580244ec);//crs en
+	writel(readl((void __iomem *)0x58024494) | 1<<1, (void __iomem *)0x58024494);//ret crs
+	writel(readl((void __iomem *)0x58024494) & 0xfffffffd, (void __iomem *)0x58024494);//ret crs
+	writel(0x22bb7f, (void __iomem *)0x40008404); // crs usb2
+	writel(readl((void __iomem *)0x40008400) | 3<<5, (void __iomem *)0x40008400);//crs Frequency error counter enable
+	writel(readl((void __iomem *)0x58024454) | 3<<20, (void __iomem *)0x58024454);// usbsel rc48
+	writel(readl((void __iomem *)0x4008000c) | 1<<6, (void __iomem *)0x4008000c);// PHYSEL
+
 	dev_info(&dev->dev, "RCC_AHB1ENR USB2OTGEN bit26 27 =%x\n",readl((void __iomem *)0x580244d8));
 
 	hsotg = devm_kzalloc(&dev->dev, sizeof(*hsotg), GFP_KERNEL);
